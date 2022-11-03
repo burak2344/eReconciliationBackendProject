@@ -73,7 +73,7 @@ namespace Business.Concrete
 					}
 				}
 			}
-
+			
 			return new SuccessResult(Messages.AddedCurrencyAccount);
 		}
 
@@ -86,6 +86,11 @@ namespace Business.Concrete
 		public IDataResult<CurrencyAccount> Get(int id)
 		{
 			return new SuccesDataResult<CurrencyAccount>(_currencyAccountDal.Get(p => p.Id == id));
+		}
+
+		public IDataResult<CurrencyAccount> GetByCode(string code, int companyId)
+		{
+			return new SuccesDataResult<CurrencyAccount>(_currencyAccountDal.Get(p => p.Code == code && p.CompanyId == companyId));
 		}
 
 		public IDataResult<List<CurrencyAccount>> GetList(int companyId)

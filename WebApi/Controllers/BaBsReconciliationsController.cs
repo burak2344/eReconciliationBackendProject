@@ -7,25 +7,15 @@ namespace WebApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountReconciliationsController : ControllerBase
+	public class BaBsReconciliationsController : ControllerBase
 	{
-		private readonly IAccountReconciliationService _accountReconciliationService;
+		private readonly IBaBsReconciliationService _babsReconciliationService;
 
-		public AccountReconciliationsController(IAccountReconciliationService accountReconciliationService)
+		public BaBsReconciliationsController(IBaBsReconciliationService babsReconciliationService)
 		{
-			_accountReconciliationService = accountReconciliationService;
+			_babsReconciliationService = babsReconciliationService;
 		}
 
-		[HttpPost("add")]
-		public IActionResult Add(AccountReconciliation accountReconciliation)
-		{
-			var result = _accountReconciliationService.Add(accountReconciliation);
-			if (result.Success)
-			{
-				return Ok(result);
-			}
-			return BadRequest(result.Message);
-		}
 		[HttpPost("addFromExcel")]
 		public IActionResult AddFromExcel(IFormFile file, int companyId)
 		{
@@ -39,7 +29,7 @@ namespace WebApi.Controllers
 					stream.Flush();
 				}
 
-				var result = _accountReconciliationService.AddToExcel(filePath, companyId);
+				var result = _babsReconciliationService.AddToExcel(filePath, companyId);
 				if (result.Success)
 				{
 					return Ok(result);
@@ -49,11 +39,10 @@ namespace WebApi.Controllers
 			return BadRequest("Dosya seçimi yapmadınız");
 		}
 
-
-		[HttpPost("update")]
-		public IActionResult Update(AccountReconciliation accountReconciliation)
+		[HttpPost("add")]
+		public IActionResult Add(BaBsReconciliation babsReconciliation)
 		{
-			var result = _accountReconciliationService.Update(accountReconciliation);
+			var result = _babsReconciliationService.Add(babsReconciliation);
 			if (result.Success)
 			{
 				return Ok(result);
@@ -61,10 +50,21 @@ namespace WebApi.Controllers
 			return BadRequest(result.Message);
 		}
 
-		[HttpGet("delete")]
-		public IActionResult Delete(AccountReconciliation accountReconciliation)
+		[HttpPost("update")]
+		public IActionResult Update(BaBsReconciliation babsReconciliation)
 		{
-			var result = _accountReconciliationService.Delete(accountReconciliation);
+			var result = _babsReconciliationService.Update(babsReconciliation);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
+		[HttpPost("delete")]
+		public IActionResult Delete(BaBsReconciliation babsReconciliation)
+		{
+			var result = _babsReconciliationService.Delete(babsReconciliation);
 			if (result.Success)
 			{
 				return Ok(result);
@@ -75,7 +75,7 @@ namespace WebApi.Controllers
 		[HttpGet("getById")]
 		public IActionResult GetById(int id)
 		{
-			var result = _accountReconciliationService.GetById(id);
+			var result = _babsReconciliationService.GetById(id);
 			if (result.Success)
 			{
 				return Ok(result);
@@ -86,7 +86,7 @@ namespace WebApi.Controllers
 		[HttpGet("getList")]
 		public IActionResult GetList(int companyId)
 		{
-			var result = _accountReconciliationService.GetList(companyId);
+			var result = _babsReconciliationService.GetList(companyId);
 			if (result.Success)
 			{
 				return Ok(result);
