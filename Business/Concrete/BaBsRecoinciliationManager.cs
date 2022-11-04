@@ -1,6 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constans;
 using Core.Aspects.Autofac.Transaction;
+using Core.Aspects.Caching;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
@@ -25,11 +26,13 @@ namespace Business.Concrete
 			_currencyAccountService = currencyAccountService;
 		}
 
+		[CacheRemoveAspect("IBaBsReconciliationService.Get")]
 		public IResult Add(BaBsReconciliation babsReconciliation)
 		{
 			_baBsRecoinciliationDal.Add(babsReconciliation);
 			return new SuccessResult(Messages.AddedBaBsReconciliation);
 		}
+		[CacheRemoveAspect("IBaBsReconciliationService.Get")]
 		[TransactionScopeAspect]
 		public IResult AddToExcel(string filePath, int companyId)
 		{
@@ -77,22 +80,26 @@ namespace Business.Concrete
 			return new SuccessResult(Messages.AddedBaBsReconciliation);
 		}
 
+		[CacheRemoveAspect("IBaBsReconciliationService.Get")]
 		public IResult Delete(BaBsReconciliation babsReconciliation)
 		{
 			_baBsRecoinciliationDal.Delete(babsReconciliation);
 			return new SuccessResult(Messages.DeletedBaBsReconciliation);
 		}
 
+		[CacheAspect(60)]
 		public IDataResult<BaBsReconciliation> GetById(int id)
 		{
 			return new SuccesDataResult<BaBsReconciliation>(_baBsRecoinciliationDal.Get(p => p.Id == id));
 		}
 
+		[CacheAspect(60)]
 		public IDataResult<List<BaBsReconciliation>> GetList(int companyId)
 		{
 			return new SuccesDataResult<List<BaBsReconciliation>>(_baBsRecoinciliationDal.GetList(p => p.CompanyId == companyId));
 		}
 
+		[CacheRemoveAspect("IBaBsReconciliationService.Get")]
 		public IResult Update(BaBsReconciliation babsReconciliation)
 		{
 			_baBsRecoinciliationDal.Update(babsReconciliation);
