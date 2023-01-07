@@ -1,4 +1,4 @@
-﻿using Core.Entities.Concrete;
+﻿ using Core.Entities.Concrete;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Security.JWT;
 using Entities.Concrete;
@@ -20,10 +20,12 @@ namespace Business.Abstract
 		IDataResult<User> GetByEmail(string email);
 		IDataResult<User> GetByMailConfirmValue(string value);
 		IDataResult<UserCompany> GetCompany(int userId);
+		IResult ChangePassword(User user);
 		IResult UserExists(string email);
 		IResult Update(User user);
 		IResult CompanyExists(Company company);
 		IResult SendConfirmEmailAgain(User user);
 		IDataResult<AccessToken> CreateAccessToken(User user, int companyId);
+		IResult SendForgotPasswordEmail(User user, string value);
 	}
 }

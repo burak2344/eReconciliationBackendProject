@@ -28,8 +28,10 @@ namespace Business.Concrete
 		private readonly IMailParameterService _mailParameterService;
 		private readonly IMailService _mailService;
 		private readonly IMailTemplateService _mailTemplateService;
+		private readonly IUserOperationClaimService _userOperationClaimService;
+		private readonly IOperationClaimService _operationClaimService;
 
-		public AuthManager(IUserService userService, ITokenHelper tokenHelper, ICompanyService companyService, IMailService mailService, IMailParameterService mailParameterService, IMailTemplateService mailTemplateService)
+		public AuthManager(IUserService userService, ITokenHelper tokenHelper, ICompanyService companyService, IMailService mailService, IMailParameterService mailParameterService, IMailTemplateService mailTemplateService, IUserOperationClaimService userOperationClaimService, IOperationClaimService operationClaimService)
 		{
 			_userService = userService;
 			_tokenHelper = tokenHelper;
@@ -37,6 +39,8 @@ namespace Business.Concrete
 			_mailService = mailService;
 			_mailParameterService = mailParameterService;
 			_mailTemplateService = mailTemplateService;
+			_userOperationClaimService = userOperationClaimService;
+			_operationClaimService = operationClaimService;
 		}
 
 		public IResult CompanyExists(Company company)
@@ -52,7 +56,8 @@ namespace Business.Concrete
 		public IDataResult<AccessToken> CreateAccessToken(User user, int companyId)
 		{
 			var claims = _userService.GetClaims(user, companyId);
-			var accessToken = _tokenHelper.CreateToken(user, claims, companyId);
+			var company = _companyService.GetById(companyId).Data;
+			var accessToken = _tokenHelper.CreateToken(user, claims, companyId, company.Name);
 			return new SuccesDataResult<AccessToken>(accessToken, Messages.SuccessfulLogin);
 		}
 
@@ -124,6 +129,24 @@ namespace Business.Concrete
 				PasswordHash = user.PasswordHash,
 				PasswordSalt = user.PasswordSalt
 			};
+
+			//var operationClaims = _operationClaimService.GetList().Data;
+			//foreach (var operationClaim in operationClaims)
+			//{
+			//	if (operationClaim.Name != "Admin")
+			//	{
+			//		UserOperationClaim userOperation = new UserOperationClaim()
+			//		{
+			//			CompanyId = company.Id,
+			//			AddedAt = DateTime.Now,
+			//			IsActive = true,
+			//			OperationClaimId = operationClaim.Id,
+			//			UserId = user.Id
+			//		};
+			//		_userOperationClaimService.Add(userOperation);
+			//	}
+			//}
+
 			var mailTemplate = _mailTemplateService.GetByCompanyId(2).Data;
 
 			mailTemplate.Id = 0;
@@ -138,7 +161,7 @@ namespace Business.Concrete
 		{
 			string subject = "Kullanıcı Kayıt Onay Maili";
 			string body = "Kullanıcınız sisteme kayıt oldu. Kaydınızı tamamlamak için aşağıdaki linke tıklamanız gerekmektedir.";
-			string link = "https://localhost:7150/api/Auth/confirmuser?value=" + user.MailConfirmValue;
+			string link = "http://localhost:4200/registerConfirm/" + user.MailConfirmValue;
 			string linkDescription = "Kaydı Onaylamak için Tıklayın";
 
 			var mailTemplate = _mailTemplateService.GetByTemplateName("Kayıt", 2);
@@ -233,6 +256,41 @@ namespace Business.Concrete
 		public IDataResult<UserCompany> GetCompany(int userId)
 		{
 			return new SuccesDataResult<UserCompany>(_companyService.GetCompany(userId).Data);
+		}
+
+		public IResult SendForgotPasswordEmail(User user, string value)
+		{
+			string subject = "Şifremi Unuttum";
+			string body = "e-Mutabakat sitemizden şifrenizi unuttuğunuzu belirttiniz. Aşağıdaki linkte tıklayarak şifrenizi yeniden belirleyebilirsiniz. Linkin 1 saat süresi vardır. Süre sonunda kullanılamaz. İyi günler dileriz.";
+			string link = "http://localhost:4200/forgot-password/" + value;
+			string linkDescription = "Şifrenizi Tekrar Belirlemek için Tıklayın";
+
+			var mailTemplate = _mailTemplateService.GetByTemplateName("Kayıt", 2);
+			string templateBody = mailTemplate.Data.Value;
+			templateBody = templateBody.Replace("{{title}}", subject);
+			templateBody = templateBody.Replace("{{message}}", body);
+			templateBody = templateBody.Replace("{{link}}", link);
+			templateBody = templateBody.Replace("{{linkDescription}}", linkDescription);
+
+
+			var mailParameter = _mailParameterService.Get(2);
+			SendMailDto sendMailDto = new SendMailDto()
+			{
+				mailParameter = mailParameter.Data,
+				email = user.Email,
+				subject = subject,
+				body = templateBody
+			};
+
+			_mailService.SendMail(sendMailDto);
+
+			return new SuccessResult(Messages.MailSendSucessful);
+		}
+
+		public IResult ChangePassword(User user)
+		{
+			_userService.Update(user);
+			return new SuccessResult(Messages.ChangedPassword);
 		}
 	}
 }

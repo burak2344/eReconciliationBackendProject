@@ -1,9 +1,11 @@
 ﻿using Business.Abstract;
+using Business.BusinessAcpects;
 using Business.Constans;
 using Business.ValidaitonRules.FluentValidation;
 using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Aspects.Caching;
+using Core.Aspects.Performance;
 using Core.Entities.Concrete;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
@@ -39,7 +41,7 @@ namespace Business.Concrete
 		[TransactionScopeAspect]
 		public IResult AddCompanyAndUserCompany(CompanyDto companyDto)
 		{
-			
+
 			_companyDal.Add(companyDto.Company);
 			_companyDal.UserCompanyAdd(companyDto.UserId, companyDto.Company.Id);
 
@@ -70,6 +72,8 @@ namespace Business.Concrete
 		{
 			return new SuccesDataResult<List<Company>>(_companyDal.GetList());
 		}
+		[PerformanceAspect(3)]
+		[SecuredOperation("Company.Update,Admin")]
 		[CacheRemoveAspect("ICompanyService.Get")]
 		public IResult Update(Company company)
 		{

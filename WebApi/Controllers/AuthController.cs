@@ -1,5 +1,6 @@
 ﻿using Business.Abstract;
 using Core.Entities.Concrete;
+using Core.Utilities.Hashing;
 using Core.Utilities.Results.Concrete;
 using Entities.Concrete;
 using Entities.Dtos;
@@ -13,10 +14,12 @@ namespace WebApi.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly IAuthService _authService;
+		private readonly IForgotPasswordService _forgotPasswordService;
 
-		public AuthController(IAuthService authService)
+		public AuthController(IAuthService authService, IForgotPasswordService forgotPasswordService)
 		{
 			_authService = authService;
+			_forgotPasswordService = forgotPasswordService;
 		}
 
 		[HttpPost("register")]
@@ -129,6 +132,80 @@ namespace WebApi.Controllers
 				return Ok(result);
 			}
 			return BadRequest(result.Message);
-		} 
+		}
+
+		[HttpGet("forgotPassword")]
+		public IActionResult ForgotPassword(string email)
+		{
+			var user = _authService.GetByEmail(email).Data;
+
+			if (user == null)
+			{
+				return BadRequest("Kullanıcı bulunamadı!");
+			}
+
+			var lists = _forgotPasswordService.GetListByUserId(user.Id).Data;
+			foreach (var item in lists)
+			{
+				item.IsActive = false;
+				_forgotPasswordService.Update(item);
+			}
+
+			var forgotPassword = _forgotPasswordService.CreateForgotPassword(user).Data;
+
+			var result = _authService.SendForgotPasswordEmail(user, forgotPassword.Value);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
+		[HttpGet("forgotPasswordLinkCheck")]
+		public IActionResult ForgotPasswordLinkCheck(string value)
+		{
+			var result = _forgotPasswordService.GetForgotPassword(value);
+			if (result == null)
+			{
+				return BadRequest("Tıkladığınız link geçersiz!");
+			}
+
+			if (result.IsActive == true)
+			{
+				DateTime date1 = DateTime.Now.AddHours(-1);
+				DateTime date2 = DateTime.Now;
+				if (result.SendDate >= date1 && result.SendDate <= date2)
+				{
+					return Ok(true);
+				}
+				else
+				{
+					return BadRequest("Tıkladığınız link geçersiz!");
+				}
+			}
+			else
+			{
+				return BadRequest("Tıkladığınız link geçersiz!");
+			}
+		}
+
+		[HttpPost("changePasswordToForgotPassword")]
+		public IActionResult ChangePasswordToForgotPassword(ForgotPasswordDto passwordDto)
+		{
+			var forgotPasswordResult = _forgotPasswordService.GetForgotPassword(passwordDto.Value);
+			forgotPasswordResult.IsActive = false;
+			_forgotPasswordService.Update(forgotPasswordResult);
+			var userResult = _authService.GetById(forgotPasswordResult.UserId).Data;
+			byte[] passwordHash, passwordSalt;
+			HashingHelper.CreatePasswordHash(passwordDto.Password, out passwordHash, out passwordSalt);
+			userResult.PasswordHash = passwordHash;
+			userResult.PasswordSalt = passwordSalt;
+			var result = _authService.ChangePassword(userResult);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
 	}
 }

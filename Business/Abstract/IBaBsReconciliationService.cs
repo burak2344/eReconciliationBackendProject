@@ -16,10 +16,10 @@ namespace Business.Abstract
 		IResult Update(BaBsReconciliation babsReconciliation);
 		IResult Delete(BaBsReconciliation babsReconciliation);
 		IDataResult<BaBsReconciliation> GetById(int id);
-		//IDataResult<BaBsReconciliation> GetByCode(string code);
+		IDataResult<BaBsReconciliation> GetByCode(string code);
 		IDataResult<List<BaBsReconciliation>> GetList(int companyId);
-		//IDataResult<List<BaBsReconciliation>> GetListByCurrencyAccountId(int currencyAccount);
-		//IDataResult<List<BaBsReconciliationDto>> GetListDto(int companyId);
-		//IResult SendReconciliationMail(BaBsReconciliationDto babsReconciliationDto);
+		IDataResult<List<BaBsReconciliation>> GetListByCurrencyAccountId(int currencyAccount);
+		IDataResult<List<BaBsReconciliationDto>> GetListDto(int companyId);
+		IResult SendReconciliationMail(BaBsReconciliationDto babsReconciliationDto);
 	}
 }

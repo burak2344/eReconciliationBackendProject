@@ -56,6 +56,10 @@ namespace Business.DependencyResolvers.Autofac
 			builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>();
 			builder.RegisterType<EfUserOperationClaimDal>().As<IUserOperationClaimDal>();
 
+			builder.RegisterType<TermsandConditionManager>().As<ITermsandConditionService>();
+			builder.RegisterType<EfTermsandConditionDal>().As<ITermsandConditionDal>();
+
+
 			builder.RegisterType<UserCompanyManager>().As<IUserCompanyService>();
 			builder.RegisterType<EfUserCompanyDal>().As<IUserCompanyDal>();
 
@@ -64,6 +68,16 @@ namespace Business.DependencyResolvers.Autofac
 
 			builder.RegisterType<MailTemplateManager>().As<IMailTemplateService>();
 			builder.RegisterType<EfMailTemplateDal>().As<IMailTemplateDal>();
+
+			builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>();
+			builder.RegisterType<EfOperationClaimDal>().As<IOperationClaimDal>();
+
+			builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>();
+			builder.RegisterType<EfUserOperationClaimDal>().As<IUserOperationClaimDal>();
+
+			builder.RegisterType<ForgotPasswordManager>().As<IForgotPasswordService>();
+			builder.RegisterType<EfForgotPasswordDal>().As<IForgotPasswordDal>();
+
 
 
 			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
