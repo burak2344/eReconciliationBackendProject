@@ -130,29 +130,29 @@ namespace Business.Concrete
 				PasswordSalt = user.PasswordSalt
 			};
 
-			//var operationClaims = _operationClaimService.GetList().Data;
-			//foreach (var operationClaim in operationClaims)
-			//{
-			//	if (operationClaim.Name != "Admin")
-			//	{
-			//		UserOperationClaim userOperation = new UserOperationClaim()
-			//		{
-			//			CompanyId = company.Id,
-			//			AddedAt = DateTime.Now,
-			//			IsActive = true,
-			//			OperationClaimId = operationClaim.Id,
-			//			UserId = user.Id
-			//		};
-			//		_userOperationClaimService.Add(userOperation);
-			//	}
-			//}
+			var operationClaims = _operationClaimService.GetList().Data;
+			foreach (var operationClaim in operationClaims)
+			{
+				if (operationClaim.Name != "Admin")
+				{
+					UserOperationClaim userOperation = new UserOperationClaim()
+					{
+						CompanyId = company.Id,
+						AddedAt = DateTime.Now,
+						IsActive = true,
+						OperationClaimId = operationClaim.Id,
+						UserId = user.Id
+					};
+					_userOperationClaimService.Add(userOperation);
+				}
+			}
 
-			var mailTemplate = _mailTemplateService.GetByCompanyId(2).Data;
+			//var mailTemplate = _mailTemplateService.GetByCompanyId(2).Data;
 
-			mailTemplate.Id = 0;
-			mailTemplate.Type = "Mutabakat";
-			mailTemplate.CompanyId = company.Id;
-			_mailTemplateService.Add(mailTemplate);
+			//mailTemplate.Id = 0;
+			//mailTemplate.Type = "Mutabakat";
+			//mailTemplate.CompanyId = company.Id;
+			//_mailTemplateService.Add(mailTemplate);
 
 			SendConfirmEmail(user);
 			return new SuccesDataResult<UserCompanyDto>(userCompanyDto, Messages.UserRegistered);
@@ -207,6 +207,23 @@ namespace Business.Concrete
 			_userService.Add(user);
 
 			_companyService.UserCompanyAdd(user.Id, companyId);
+
+			var operationClaims = _operationClaimService.GetList().Data;
+			foreach (var operationClaim in operationClaims)
+			{
+				if (operationClaim.Name != "Admin")
+				{
+					UserOperationClaim userOperation = new UserOperationClaim()
+					{
+						CompanyId = companyId,
+						AddedAt = DateTime.Now,
+						IsActive = true,
+						OperationClaimId = operationClaim.Id,
+						UserId = user.Id
+					};
+					_userOperationClaimService.Add(userOperation);
+				}
+			}
 
 			SendConfirmEmail(user);
 

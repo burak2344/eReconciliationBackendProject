@@ -23,7 +23,7 @@ namespace Business.Concrete
 			_userOperationClaimDal = userOperationClaimDal;
 		}
 
-		[SecuredOperation("Admin,UserOperationClaim.Add")]
+		//[SecuredOperation("Admin,UserOperationClaim.Add")]
 		public IResult Add(UserOperationClaim userOperationClaim)
 		{
 			_userOperationClaimDal.Add(userOperationClaim);
