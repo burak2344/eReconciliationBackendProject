@@ -107,7 +107,7 @@ namespace Business.Concrete
 			return new SuccesDataResult<CurrencyAccount>(_currencyAccountDal.Get(p => p.Id == id));
 		}
 		[PerformanceAspect(3)]
-		//[SecuredOperation("CurrencyAccount.Get,Admin")]
+		[SecuredOperation("CurrencyAccount.Get,Admin")]
 		[CacheAspect(60)]
 		public IDataResult<CurrencyAccount> GetByCode(string code, int companyId)
 		{
@@ -122,8 +122,9 @@ namespace Business.Concrete
 		}
 		[PerformanceAspect(3)]
 		[SecuredOperation("CurrencyAccount.Update,Admin")]
-		[ValidationAspect(typeof(CurrencyAccountValidator))]
 		[CacheRemoveAspect("ICurrencyAccountService.Get")]
+		[CacheRemoveAspect("IAccountReconciliationService.Get")]
+		[ValidationAspect(typeof(CurrencyAccountValidator))]
 		public IResult Update(CurrencyAccount currencyAccount)
 		{
 			_currencyAccountDal.Update(currencyAccount);

@@ -16,6 +16,28 @@ namespace WebApi.Controllers
 			_companyService = companyService;
 		}
 
+		[HttpGet("getcompanylist")]
+		public IActionResult GetCompanyList()
+		{
+			var result = _companyService.GetList();
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
+		[HttpGet("getCompanyListByUserid")]
+		public IActionResult GetCompanyListByUserId(int userId)
+		{
+			var result = _companyService.GetListByUserId(userId);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
 		[HttpGet("getCompany")]
 		public IActionResult GetById(int companyId)
 		{
@@ -49,16 +71,26 @@ namespace WebApi.Controllers
 			return BadRequest(result.Message);
 		}
 
-		[HttpGet("getcompanylist")]
-		public IActionResult GetCompanyList()
+		[HttpPost("changeStatusCompany")]
+		public IActionResult ChangeStatusCompany(Company company)
 		{
-			var result = _companyService.GetList();
+			if (company.IsActive)
+			{
+				company.IsActive = false;
+			}
+			else
+			{
+				company.IsActive = true;
+			}
+
+			var result = _companyService.Update(company);
 			if (result.Success)
 			{
 				return Ok(result);
 			}
 			return BadRequest(result.Message);
 		}
+
 		[HttpPost("updateCompany")]
 		public IActionResult UpdateCompany(Company company)
 		{

@@ -37,5 +37,16 @@ namespace WebApi.Controllers
 			}
 			return BadRequest(result.Message);
 		}
+
+		[HttpGet("getByCompanyId")]
+		public IActionResult GetByCompanyId(int companyId)
+		{
+			var result = _mailTemplateService.GetByCompanyId(companyId);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
 	}
 }

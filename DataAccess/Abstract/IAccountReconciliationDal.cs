@@ -13,5 +13,8 @@ namespace DataAccess.Abstract
 	{
 		List<AccountReconciliationDto> GetAllDto(int companyId);
 		AccountReconciliationDto GetByIdDto(int id);
+
+		AccountReconciliationDto GetByCodeDto(string code);
+		AccountReconciliationsCountDto GetCountDto(int companyId);
 	}
 }

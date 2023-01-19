@@ -67,7 +67,16 @@ namespace Business.Concrete
 		[CacheRemoveAspect("IMailTemplateService.Get")]
 		public IResult Update(MailTemplate mailTemplate)
 		{
-			_mailTemplateDal.Update(mailTemplate);
+			var result = _mailTemplateDal.Get(p => p.CompanyId == mailTemplate.CompanyId);
+			if (result != null)
+			{
+				_mailTemplateDal.Update(mailTemplate);
+			}
+			else
+			{
+				mailTemplate.Id = 0;
+				_mailTemplateDal.Add(mailTemplate);
+			}
 			return new SuccessResult(Messages.MailTemplateUpdated);
 		}
 	}

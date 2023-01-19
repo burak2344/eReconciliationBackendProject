@@ -44,39 +44,38 @@ namespace Business.DependencyResolvers.Autofac
 			builder.RegisterType<MailParameterManager>().As<IMailParameterService>();
 			builder.RegisterType<EfMailParameterDal>().As<IMailParameterDal>();
 
+			builder.RegisterType<MailTemplateManager>().As<IMailTemplateService>();
+			builder.RegisterType<EfMailTemplateDal>().As<IMailTemplateDal>();
+
 			builder.RegisterType<MailManeger>().As<IMailService>();
 			builder.RegisterType<EfMailDal>().As<IMailDal>();
 
 			builder.RegisterType<UserManager>().As<IUserService>();
 			builder.RegisterType<EfUserDal>().As<IUserDal>();
 
+			builder.RegisterType<TermsandConditionManager>().As<ITermsandConditionService>();
+			builder.RegisterType<EfTermsandConditionDal>().As<ITermsandConditionDal>();
+
+			builder.RegisterType<UserThemeOptionManager>().As<IUserThemeOptionService>();
+			builder.RegisterType<EfUserThemeOptionDal>().As<IUserThemeOptionDal>();
+
 			builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>();
 			builder.RegisterType<EfOperationClaimDal>().As<IOperationClaimDal>();
+
+			builder.RegisterType<ForgotPasswordManager>().As<IForgotPasswordService>();
+			builder.RegisterType<EfForgotPasswordDal>().As<IForgotPasswordDal>();
 
 			builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>();
 			builder.RegisterType<EfUserOperationClaimDal>().As<IUserOperationClaimDal>();
 
-			builder.RegisterType<TermsandConditionManager>().As<ITermsandConditionService>();
-			builder.RegisterType<EfTermsandConditionDal>().As<ITermsandConditionDal>();
-
+			builder.RegisterType<UserReletionShipManager>().As<IUserReletionShipService>();
+			builder.RegisterType<EfUserReletionShipDal>().As<IUserReletionshipDal>();
 
 			builder.RegisterType<UserCompanyManager>().As<IUserCompanyService>();
 			builder.RegisterType<EfUserCompanyDal>().As<IUserCompanyDal>();
 
 			builder.RegisterType<AuthManager>().As<IAuthService>();
 			builder.RegisterType<JwtHelper>().As<ITokenHelper>();
-
-			builder.RegisterType<MailTemplateManager>().As<IMailTemplateService>();
-			builder.RegisterType<EfMailTemplateDal>().As<IMailTemplateDal>();
-
-			builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>();
-			builder.RegisterType<EfOperationClaimDal>().As<IOperationClaimDal>();
-
-			builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>();
-			builder.RegisterType<EfUserOperationClaimDal>().As<IUserOperationClaimDal>();
-
-			builder.RegisterType<ForgotPasswordManager>().As<IForgotPasswordService>();
-			builder.RegisterType<EfForgotPasswordDal>().As<IForgotPasswordDal>();
 
 
 

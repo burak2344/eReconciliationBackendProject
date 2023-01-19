@@ -17,16 +17,6 @@ namespace WebApi.Controllers
 			_accountReconciliationService = accountReconciliationService;
 		}
 
-		[HttpPost("add")]
-		public IActionResult Add(AccountReconciliation accountReconciliation)
-		{
-			var result = _accountReconciliationService.Add(accountReconciliation);
-			if (result.Success)
-			{
-				return Ok(result);
-			}
-			return BadRequest(result.Message);
-		}
 		[HttpPost("addFromExcel")]
 		public IActionResult AddFromExcel(IFormFile file, int companyId)
 		{
@@ -50,6 +40,16 @@ namespace WebApi.Controllers
 			return BadRequest("Dosya seçimi yapmadınız");
 		}
 
+		[HttpPost("add")]
+		public IActionResult Add(AccountReconciliation accountReconciliation)
+		{
+			var result = _accountReconciliationService.Add(accountReconciliation);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
 
 		[HttpPost("update")]
 		public IActionResult Update(AccountReconciliation accountReconciliation)
@@ -62,10 +62,21 @@ namespace WebApi.Controllers
 			return BadRequest(result.Message);
 		}
 
-		[HttpGet("delete")]
-		public IActionResult Delete(AccountReconciliation accountReconciliation)
+		[HttpPost("updateResult")]
+		public IActionResult UpdateResult(AccountReconciliation accountReconciliation)
 		{
-			var result = _accountReconciliationService.Delete(accountReconciliation);
+			var result = _accountReconciliationService.Update(accountReconciliation);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
+		[HttpGet("delete")]
+		public IActionResult Delete(int id)
+		{
+			var result = _accountReconciliationService.Delete(id);
 			if (result.Success)
 			{
 				return Ok(result);
@@ -94,6 +105,30 @@ namespace WebApi.Controllers
 			}
 			return BadRequest(result.Message);
 		}
+
+		[HttpGet("getCount")]
+		public IActionResult GetCount(int companyId)
+		{
+			var result = _accountReconciliationService.GetCountDto(companyId);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
+		//SendReconciliationMail(AccountReconciliationDto accountReconciliationDto)
+		[HttpGet("sendReconciliationMail")]
+		public IActionResult SendReconciliationMail(int id)
+		{
+			var result = _accountReconciliationService.SendReconciliationMail(id);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
 		[HttpGet("getByCode")]
 		public IActionResult GetByCode(string code)
 		{
@@ -105,11 +140,10 @@ namespace WebApi.Controllers
 			return BadRequest(result.Message);
 		}
 
-		//SendReconciliationMail(AccountReconciliationDto accountReconciliationDto)
-		[HttpPost("sendReconciliationMail")]
-		public IActionResult SendReconciliationMail(AccountReconciliationDto accountReconciliationDto)
+		[HttpGet("getByCodeDto")]
+		public IActionResult GetByCodeDto(string code)
 		{
-			var result = _accountReconciliationService.SendReconciliationMail(accountReconciliationDto);
+			var result = _accountReconciliationService.GetByCodeDto(code);
 			if (result.Success)
 			{
 				return Ok(result);
@@ -117,6 +151,15 @@ namespace WebApi.Controllers
 			return BadRequest(result.Message);
 		}
 
-
+		[HttpPost("sendResult")]
+		public IActionResult sendResult(ReconciliationResultDto reconciliationResultDto)
+		{
+			var result = _accountReconciliationService.Result(reconciliationResultDto);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
 	}
 }

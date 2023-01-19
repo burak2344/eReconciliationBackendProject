@@ -17,7 +17,7 @@ namespace Business.Abstract
 		IDataResult<Company> GetById(int id);
 		IResult AddCompanyAndUserCompany(CompanyDto companyDto);
 		IDataResult<List<Company>> GetList();
-
+		IDataResult<List<Company>> GetListByUserId(int userId);
 		IResult CompanyExists(Company company);
 		IDataResult<UserCompany> GetCompany(int userId);
 		IResult UserCompanyAdd(int userId, int companyId);

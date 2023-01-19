@@ -10,11 +10,13 @@ namespace WebApi.Controllers
 	public class MailParameterController : ControllerBase
 	{
 		private readonly IMailParameterService _mailParameterService;
-
-		public MailParameterController(IMailParameterService mailParameterService)
+		private readonly IMailService _mailService;
+		public MailParameterController(IMailParameterService mailParameterService, IMailService mailService)
 		{
 			_mailParameterService = mailParameterService;
+			_mailService = mailService;
 		}
+
 		[HttpPost("update")]
 		public IActionResult Update(MailParameter mailParameter)
 		{
@@ -25,5 +27,28 @@ namespace WebApi.Controllers
 			}
 			return BadRequest(result.Message);
 		}
+
+		[HttpGet("getById")]
+		public IActionResult GetById(int id)
+		{
+			var result = _mailParameterService.Get(id);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
+		[HttpGet("connectionTest")]
+		public IActionResult ConnectionTest(int companyId)
+		{
+			var result = _mailParameterService.ConnectionTest(companyId);
+			if (result.Success)
+			{
+				return Ok(result);
+			}
+			return BadRequest(result.Message);
+		}
+
 	}
 }

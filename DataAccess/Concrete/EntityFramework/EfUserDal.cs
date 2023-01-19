@@ -14,6 +14,28 @@ namespace DataAccess.Concrete.EntityFramework
 {
 	public class EfUserDal : EfEntityRepositoryBase<User, ContextDb>, IUserDal
 	{
+		public List<AdminCompaniesForUserDto> GetAdminCompaniesForUser(int adminUserId, int userUserId)
+		{
+			using (var context = new ContextDb())
+			{
+				var result = from userCompany in context.UserCompanies.Where(p => p.UserId == adminUserId)
+							 join company in context.Companies on userCompany.CompanyId equals company.Id
+							 select new AdminCompaniesForUserDto
+							 {
+								 Id = company.Id,
+								 AddedAt = company.AddedAt,
+								 Address = company.Address,
+								 IdentityNumber = company.IdentityNumber,
+								 IsActive = company.IsActive,
+								 Name = company.Name,
+								 TaxDepartment = company.TaxDepartment,
+								 TaxIdNumber = company.TaxIdNumber,
+								 IsTrue = (context.UserCompanies.Where(p => p.UserId == userUserId && p.CompanyId == company.Id).Count() > 0 ? true : false)
+							 };
+				return result.Where(p => p.IsTrue == false).OrderBy(p => p.Name).ToList();
+			}
+		}
+
 		public List<OperationClaim> GetClaims(User user, int companyId)
 		{
 			using (var context = new ContextDb())

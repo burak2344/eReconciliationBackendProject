@@ -11,6 +11,6 @@ namespace Entities.Dtos
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }
-       // public int AdminUserId { get; set; }
+        public int AdminUserId { get; set; }
     }
 }

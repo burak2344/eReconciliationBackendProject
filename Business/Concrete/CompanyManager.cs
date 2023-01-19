@@ -23,10 +23,16 @@ namespace Business.Concrete
 	public class CompanyManager : ICompanyService
 	{
 		private readonly ICompanyDal _companyDal;
+		private readonly IOperationClaimService _operationClaimService;
+		private readonly IUserOperationClaimService _userOperationClaimService;
+		private readonly IMailTemplateService _mailTemplateService;
 
-		public CompanyManager(ICompanyDal companyDal)
+		public CompanyManager(ICompanyDal companyDal, IOperationClaimService operationClaimService, IUserOperationClaimService userOperationClaimService, IMailTemplateService mailTemplateService)
 		{
 			_companyDal = companyDal;
+			_operationClaimService = operationClaimService;
+			_userOperationClaimService = userOperationClaimService;
+			_mailTemplateService = mailTemplateService;
 		}
 
 		[CacheRemoveAspect("ICompanyService.Get")]
@@ -41,9 +47,43 @@ namespace Business.Concrete
 		[TransactionScopeAspect]
 		public IResult AddCompanyAndUserCompany(CompanyDto companyDto)
 		{
+			Company company = new Company()
+			{
+				Id = companyDto.Id,
+				Name = companyDto.Name,
+				TaxDepartment = companyDto.TaxDepartment,
+				TaxIdNumber = companyDto.TaxIdNumber,
+				IdentityNumber = companyDto.IdentityNumber,
+				Address = companyDto.Address,
+				AddedAt = companyDto.AddedAt,
+				IsActive = companyDto.IsActive
+			};
 
-			_companyDal.Add(companyDto.Company);
-			_companyDal.UserCompanyAdd(companyDto.UserId, companyDto.Company.Id);
+			_companyDal.Add(company);
+			_companyDal.UserCompanyAdd(companyDto.UserId, company.Id);
+
+			var operationClaims = _operationClaimService.GetList().Data;
+			foreach (var operationClaim in operationClaims)
+			{
+				if (operationClaim.Name != "Admin")
+				{
+					UserOperationClaim userOperation = new UserOperationClaim()
+					{
+						CompanyId = company.Id,
+						AddedAt = DateTime.Now,
+						IsActive = true,
+						OperationClaimId = operationClaim.Id,
+						UserId = companyDto.UserId
+					};
+					_userOperationClaimService.Add(userOperation);
+				}
+			}
+
+			var mailTemplate = _mailTemplateService.GetByCompanyId(2).Data;
+			mailTemplate.Id = 0;
+			mailTemplate.Type = "Mutabakat";
+			mailTemplate.CompanyId = company.Id;
+			_mailTemplateService.Add(mailTemplate);
 
 			return new SuccessResult(Messages.AddedCompany);
 		}
@@ -72,6 +112,13 @@ namespace Business.Concrete
 		{
 			return new SuccesDataResult<List<Company>>(_companyDal.GetList());
 		}
+
+		[CacheAspect(60)]
+		public IDataResult<List<Company>> GetListByUserId(int userId)
+		{
+			return new SuccesDataResult<List<Company>>(_companyDal.GetListByUserId(userId));
+		}
+
 		[PerformanceAspect(3)]
 		[SecuredOperation("Company.Update,Admin")]
 		[CacheRemoveAspect("ICompanyService.Get")]

@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Business.Abstract
 {
-	public interface IMailParameterService
+	public interface IUserThemeOptionService
 	{
-		IResult Update(MailParameter mailParameter);
-		IDataResult<MailParameter> Get(int companyId);
-		IResult ConnectionTest(int companyId);
+		IResult Update(UserThemeOption userThemeOption);
+		void Delete(UserThemeOption userThemeOption);
+		IDataResult<UserThemeOption> GetByUserId(int userId);
 	}
 }

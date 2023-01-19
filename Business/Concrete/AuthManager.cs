@@ -30,8 +30,10 @@ namespace Business.Concrete
 		private readonly IMailTemplateService _mailTemplateService;
 		private readonly IUserOperationClaimService _userOperationClaimService;
 		private readonly IOperationClaimService _operationClaimService;
+		private readonly IUserReletionShipService _userReletionShipService;
+		private readonly IUserThemeOptionService _userThemeOptionService;
 
-		public AuthManager(IUserService userService, ITokenHelper tokenHelper, ICompanyService companyService, IMailService mailService, IMailParameterService mailParameterService, IMailTemplateService mailTemplateService, IUserOperationClaimService userOperationClaimService, IOperationClaimService operationClaimService)
+		public AuthManager(IUserService userService, ITokenHelper tokenHelper, ICompanyService companyService, IMailService mailService, IMailParameterService mailParameterService, IMailTemplateService mailTemplateService, IUserOperationClaimService userOperationClaimService, IOperationClaimService operationClaimService, IUserReletionShipService userReletionShipService, IUserThemeOptionService userThemeOptionService)
 		{
 			_userService = userService;
 			_tokenHelper = tokenHelper;
@@ -41,6 +43,8 @@ namespace Business.Concrete
 			_mailTemplateService = mailTemplateService;
 			_userOperationClaimService = userOperationClaimService;
 			_operationClaimService = operationClaimService;
+			_userReletionShipService = userReletionShipService;
+			_userThemeOptionService = userThemeOptionService;
 		}
 
 		public IResult CompanyExists(Company company)
@@ -147,12 +151,22 @@ namespace Business.Concrete
 				}
 			}
 
-			//var mailTemplate = _mailTemplateService.GetByCompanyId(2).Data;
+			var mailTemplate = _mailTemplateService.GetByCompanyId(2).Data;
 
-			//mailTemplate.Id = 0;
-			//mailTemplate.Type = "Mutabakat";
-			//mailTemplate.CompanyId = company.Id;
-			//_mailTemplateService.Add(mailTemplate);
+			mailTemplate.Id = 0;
+			mailTemplate.Type = "Mutabakat";
+			mailTemplate.CompanyId = company.Id;
+			_mailTemplateService.Add(mailTemplate);
+
+			UserThemeOption userThemeOption = new UserThemeOption()
+			{
+				UserId = user.Id,
+				SidenavColor = "primary",
+				SidenavType = "dark",
+				Mode = ""
+			};
+
+			_userThemeOptionService.Update(userThemeOption);
 
 			SendConfirmEmail(user);
 			return new SuccesDataResult<UserCompanyDto>(userCompanyDto, Messages.UserRegistered);
@@ -187,8 +201,8 @@ namespace Business.Concrete
 			user.MailConfirmDate = DateTime.Now;
 			_userService.Update(user);
 		}
-
-		public IDataResult<User> RegisterSecondAccount(UserForRegister userForRegister, string password, int companyId)
+		[TransactionScopeAspect]
+		public IDataResult<List<UserReletionshipDto>> RegisterSecondAccount(UserForRegister userForRegister, string password, int companyId, int adminUserId)
 		{
 			byte[] passwordHash, passwordSalt;
 			HashingHelper.CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -225,9 +239,29 @@ namespace Business.Concrete
 				}
 			}
 
+			UserReletionship userReletionship = new UserReletionship
+			{
+				UserUserId = user.Id,
+				AdminUserId = adminUserId
+			};
+
+			_userReletionShipService.Add(userReletionship);
+
+			var result = _userReletionShipService.GetListDto(adminUserId).Data;
+
+			UserThemeOption userThemeOption = new UserThemeOption()
+			{
+				UserId = user.Id,
+				SidenavColor = "primary",
+				SidenavType = "dark",
+				Mode = ""
+			};
+
+			_userThemeOptionService.Update(userThemeOption);
+
 			SendConfirmEmail(user);
 
-			return new SuccesDataResult<User>(user, Messages.UserRegistered);
+			return new SuccesDataResult<List<UserReletionshipDto>>(result, Messages.UserRegistered);
 		}
 
 		public IResult SendConfirmEmailAgain(User user)
